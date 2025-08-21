@@ -12,7 +12,7 @@ use Monolog\Handler\StreamHandler;
 
 class TelegramManager
 {
-    private API $madelineProto;
+    private ?API $madelineProto = null;
     private Database $database;
     private Logger $logger;
     private string $sessionPath;
@@ -101,16 +101,33 @@ class TelegramManager
 
     private function initializeMadelineProto(): void
     {
-        // Vaqtincha MadelineProto ni o'chirib qo'yamiz
-        // chunki u web interface xatoliklarini keltirib chiqaryapti
+        $sessionFile = $this->sessionPath . $this->phone . '.session';
         
-        $this->logger->info("MadelineProto temporarily disabled to prevent web interface errors");
-        
-        // Mock MadelineProto instance yaratamiz
-        $this->madelineProto = null;
-        
-        // Web interface xatoliklarini oldini olish
-        $this->logger->info("Web interface errors prevented");
+        try {
+            // MadelineProto 8.0 uchun to'g'ri sozlamalar
+            $settings = new Settings;
+            
+            // API credentials
+            $settings->getAppInfo()->setApiId((int)$_ENV['TELEGRAM_API_ID']);
+            $settings->getAppInfo()->setApiHash($_ENV['TELEGRAM_API_HASH']);
+            
+            // Web interface ni to'liq o'chirish
+            $settings->getWeb()->setEnabled(false);
+            
+            $this->logger->info("Initializing MadelineProto with web interface disabled");
+            
+            // Create MadelineProto instance
+            $this->madelineProto = new API($sessionFile, $settings);
+            
+            // Web interface ni qo'shimcha o'chirish
+            $this->disableWebInterface($sessionFile);
+            
+            $this->logger->info("MadelineProto initialized successfully for session: " . $sessionFile);
+        } catch (\Exception $e) {
+            $this->logger->error("Failed to initialize MadelineProto: " . $e->getMessage());
+            // Xatolik bo'lsa ham davom etamiz
+            $this->madelineProto = null;
+        }
     }
 
     public function authenticate(): array
@@ -137,7 +154,7 @@ class TelegramManager
             $this->madelineProto->start();
             
             // Check if we need to authenticate
-            if ($this->madelineProto && !$this->madelineProto->getSelf()) {
+            if ($this->madelineProto && $this->madelineProto->getSelf() === null) {
                 $this->logger->info("Authentication required - QR code or phone verification needed");
                 return [
                     'success' => false,
@@ -177,7 +194,7 @@ class TelegramManager
             }
             
             // Check if we're authenticated first
-            if (!$this->madelineProto->getSelf()) {
+            if ($this->madelineProto->getSelf() === null) {
                 throw new \RuntimeException("Not authenticated. Please authenticate first.");
             }
             
@@ -222,6 +239,11 @@ class TelegramManager
     public function getAdminChannels(): array
     {
         try {
+            if (!$this->madelineProto) {
+                $this->logger->warning("MadelineProto not available for fetching admin channels");
+                return [];
+            }
+            
             $this->logger->info("Fetching admin channels for phone: " . $this->phone);
             
             $dialogs = $this->madelineProto->getDialogs();
@@ -271,6 +293,10 @@ class TelegramManager
     private function isUserAdmin(int $channelId): bool
     {
         try {
+            if (!$this->madelineProto) {
+                return false;
+            }
+            
             $participants = $this->madelineProto->getParticipants([
                 'channel' => 'channel#' . $channelId,
                 'filter' => ['_' => 'channelParticipantsAdmins'],
@@ -312,6 +338,13 @@ class TelegramManager
     public function sendLiveStream(int $channelId, string $youtubeUrl, string $streamTitle): array
     {
         try {
+            if (!$this->madelineProto) {
+                return [
+                    'success' => false,
+                    'message' => 'Telegram integration not available'
+                ];
+            }
+            
             $this->logger->info("Starting live stream to channel $channelId with YouTube URL: $youtubeUrl");
             
             // Save stream info to database
@@ -357,6 +390,13 @@ class TelegramManager
     public function stopLiveStream(int $channelId): array
     {
         try {
+            if (!$this->madelineProto) {
+                return [
+                    'success' => false,
+                    'message' => 'Telegram integration not available'
+                ];
+            }
+            
             $this->logger->info("Stopping live stream for channel $channelId");
             
             // Update database status
