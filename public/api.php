@@ -8,7 +8,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use TelegramLive\TelegramManager;
 use TelegramLive\LiveStreamManager;
-use TelegramLive\Config\Database;
+use TelegramLive\Database;
 
 // Load environment variables
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');

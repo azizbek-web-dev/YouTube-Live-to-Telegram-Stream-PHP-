@@ -6,7 +6,7 @@ use danog\MadelineProto\API;
 use danog\MadelineProto\Settings;
 use danog\MadelineProto\Settings\Connection;
 use danog\MadelineProto\Settings\RPC;
-use TelegramLive\Config\Database;
+use TelegramLive\Database;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 

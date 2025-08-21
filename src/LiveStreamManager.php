@@ -2,7 +2,7 @@
 
 namespace TelegramLive;
 
-use TelegramLive\Config\Database;
+use TelegramLive\Database;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
