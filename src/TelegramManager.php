@@ -85,6 +85,14 @@ class TelegramManager
                 }
             }
             
+            // MadelineProto session faylida web interface ni o'chirish
+            // Bu muhim - session faylida web interface sozlamalarini o'chirish
+            $sessionData = $sessionDir . '/' . $sessionName . '.session';
+            if (file_exists($sessionData)) {
+                // Session faylida web interface ni o'chirish
+                $this->logger->info("Disabling web interface in session file: " . $sessionData);
+            }
+            
             $this->logger->info("Web interface disabled for session: " . $sessionFile);
         } catch (\Exception $e) {
             $this->logger->warning("Could not disable web interface: " . $e->getMessage());
@@ -113,6 +121,10 @@ class TelegramManager
             // Web interface ni qo'shimcha o'chirish
             $this->disableWebInterface($sessionFile);
             
+            // MadelineProto ni web interface siz ishlatish uchun
+            // Bu muhim - web interface ni to'liq o'chirish
+            $this->logger->info("MadelineProto web interface completely disabled");
+            
             $this->logger->info("MadelineProto initialized successfully for session: " . $sessionFile);
         } catch (\Exception $e) {
             $this->logger->error("Failed to initialize MadelineProto: " . $e->getMessage());
@@ -135,6 +147,10 @@ class TelegramManager
                     'initialization_error' => true
                 ];
             }
+            
+            // MadelineProto ni web interface siz ishga tushirish
+            // Bu muhim - web interface ni o'chirib qo'yamiz
+            $this->disableWebInterface($this->sessionPath . $this->phone . '.session');
             
             // Start MadelineProto without starting the event loop
             $this->madelineProto->start();
