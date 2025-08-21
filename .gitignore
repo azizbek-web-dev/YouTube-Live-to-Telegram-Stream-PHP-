@@ -1,0 +1,99 @@
+# Environment Configuration
+.env
+.env.local
+.env.production
+
+# Dependencies
+/vendor/
+/node_modules/
+composer.lock
+
+# Session Files
+/public/sessions/
+/sessions/
+*.session/
+*.session
+
+# Log Files
+/logs/
+/public/logs/
+*.log
+MadelineProto.log
+
+# Upload Files
+/uploads/
+/public/uploads/
+
+# Cache and Temporary Files
+.DS_Store
+Thumbs.db
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# IDE Files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# PHP
+*.phar
+
+# Composer
+composer.phar
+composer.lock
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# Database
+*.sqlite
+*.db
+
+# Local development
+/test.php
+/simple_test.php
+/test_*.php
