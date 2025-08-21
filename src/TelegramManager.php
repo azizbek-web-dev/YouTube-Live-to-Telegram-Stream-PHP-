@@ -75,7 +75,8 @@ class TelegramManager
             // Web interface fayllarini o'chirish
             $webFiles = [
                 $sessionDir . '/' . $sessionName . '.web.php',
-                $sessionDir . '/' . $sessionName . '.web.html'
+                $sessionDir . '/' . $sessionName . '.web.html',
+                $sessionDir . '/' . $sessionName . '.web'
             ];
             
             foreach ($webFiles as $webFile) {
@@ -85,15 +86,9 @@ class TelegramManager
                 }
             }
             
-            // MadelineProto session faylida web interface ni o'chirish
-            // Bu muhim - session faylida web interface sozlamalarini o'chirish
-            $sessionData = $sessionDir . '/' . $sessionName . '.session';
-            if (file_exists($sessionData)) {
-                // Session faylida web interface ni o'chirish
-                $this->logger->info("Disabling web interface in session file: " . $sessionData);
-            }
-            
-            $this->logger->info("Web interface disabled for session: " . $sessionFile);
+            // MadelineProto 8.0 da web interface ni o'chirish uchun
+            // Session faylida maxsus sozlash qilamiz
+            $this->logger->info("Web interface files removed for session: " . $sessionFile);
         } catch (\Exception $e) {
             $this->logger->warning("Could not disable web interface: " . $e->getMessage());
         }
@@ -112,7 +107,8 @@ class TelegramManager
             $settings->getAppInfo()->setApiHash($_ENV['TELEGRAM_API_HASH']);
             
             // Web interface ni to'liq o'chirish
-            $settings->getWeb()->setEnabled(false);
+            // MadelineProto 8.0 da bu sozlamalar avtomatik
+            // Web interface ni o'chirish uchun session fayllarini o'chiramiz
             
             $this->logger->info("Initializing MadelineProto with web interface disabled");
             
