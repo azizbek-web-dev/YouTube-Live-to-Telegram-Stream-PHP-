@@ -64,6 +64,33 @@ class TelegramManager
         return $this->sessionPath;
     }
 
+    private function disableWebInterface(string $sessionFile): void
+    {
+        try {
+            // MadelineProto 8.0 da web interface ni o'chirish uchun
+            // Session faylida maxsus sozlash qilamiz
+            $sessionDir = dirname($sessionFile);
+            $sessionName = basename($sessionFile, '.session');
+            
+            // Web interface fayllarini o'chirish
+            $webFiles = [
+                $sessionDir . '/' . $sessionName . '.web.php',
+                $sessionDir . '/' . $sessionName . '.web.html'
+            ];
+            
+            foreach ($webFiles as $webFile) {
+                if (file_exists($webFile)) {
+                    unlink($webFile);
+                    $this->logger->info("Removed web interface file: " . $webFile);
+                }
+            }
+            
+            $this->logger->info("Web interface disabled for session: " . $sessionFile);
+        } catch (\Exception $e) {
+            $this->logger->warning("Could not disable web interface: " . $e->getMessage());
+        }
+    }
+
     private function initializeMadelineProto(): void
     {
         $sessionFile = $this->sessionPath . $this->phone . '.session';
@@ -76,21 +103,21 @@ class TelegramManager
             $settings->getConnection()->setRetry(true);
             
             // Disable web interface to prevent longPollQr errors
-            $settings->getRPC()->setNoReturn(false);
             $settings->getRPC()->setLimitMedia(true);
             
-            // Disable web interface completely
-            $settings->getWeb()->setEnabled(false);
+            // MadelineProto 8.0 da web interface ni o'chirish uchun
+            // Settings da maxsus sozlash yo'q, shuning uchun keyin o'chirishimiz kerak
             
             // Set API credentials from environment
             $settings->getAppInfo()->setApiId((int)$_ENV['TELEGRAM_API_ID']);
             $settings->getAppInfo()->setApiHash($_ENV['TELEGRAM_API_HASH']);
 
-            // Create MadelineProto instance with disabled web interface
+            // Create MadelineProto instance
             $this->madelineProto = new API($sessionFile, $settings);
             
-            // Disable web interface after initialization
-            $this->madelineProto->setWebTemplate('');
+            // MadelineProto 8.0 da web interface ni o'chirish uchun
+            // Session faylida maxsus sozlash qilamiz
+            $this->disableWebInterface($sessionFile);
             
             $this->logger->info("MadelineProto initialized successfully for session: " . $sessionFile);
         } catch (\Exception $e) {
