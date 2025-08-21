@@ -24,11 +24,19 @@ RewriteCond %{REQUEST_URI} ^/.*\.web\.(php|html)
 RewriteRule .* - [F,L]
 
 # Block MadelineProto web interface completely
-RewriteCond %{REQUEST_URI} ^/.*(web|qr|login)
+RewriteCond %{REQUEST_URI} ^/.*(web|qr|login|waitQrCodeOrLogin|getQrCode)
 RewriteRule .* - [F,L]
 
 # Block any MadelineProto related requests
 RewriteCond %{REQUEST_URI} ^/.*madeline
+RewriteRule .* - [F,L]
+
+# Block MadelineProto session files
+RewriteCond %{REQUEST_URI} ^/.*\.session
+RewriteRule .* - [F,L]
+
+# Block MadelineProto web files
+RewriteCond %{REQUEST_URI} ^/.*\.web\.(php|html)
 RewriteRule .* - [F,L]
 
 # Handle all other requests
