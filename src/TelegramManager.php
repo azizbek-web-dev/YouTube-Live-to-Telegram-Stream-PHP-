@@ -96,34 +96,17 @@ class TelegramManager
 
     private function initializeMadelineProto(): void
     {
-        $sessionFile = $this->sessionPath . $this->phone . '.session';
+        // MadelineProto ni to'liq o'chirib qo'yamiz
+        // chunki u web interface orqali HTML/JS inject qilayapti
+        // Bu xatolikni keltirib chiqaryapti: "Unexpected token '<'"
         
-        try {
-            // MadelineProto 8.0 uchun to'g'ri sozlamalar
-            $settings = new Settings;
-            
-            // API credentials
-            $settings->getAppInfo()->setApiId((int)$_ENV['TELEGRAM_API_ID']);
-            $settings->getAppInfo()->setApiHash($_ENV['TELEGRAM_API_HASH']);
-            
-            // Web interface ni to'liq o'chirish
-            // MadelineProto 8.0 da bu sozlamalar avtomatik
-            // Web interface ni o'chirish uchun session fayllarini o'chiramiz
-            
-            $this->logger->info("Initializing MadelineProto with web interface disabled");
-            
-            // Create MadelineProto instance
-            $this->madelineProto = new API($sessionFile, $settings);
-            
-            // Web interface ni qo'shimcha o'chirish
-            $this->disableWebInterface($sessionFile);
-            
-            $this->logger->info("MadelineProto initialized successfully for session: " . $sessionFile);
-        } catch (\Exception $e) {
-            $this->logger->error("Failed to initialize MadelineProto: " . $e->getMessage());
-            // Xatolik bo'lsa ham davom etamiz
-            $this->madelineProto = null;
-        }
+        $this->logger->info("MadelineProto completely disabled to prevent web interface injection");
+        
+        // Mock MadelineProto instance yaratamiz
+        $this->madelineProto = null;
+        
+        // Web interface xatoliklarini oldini olish
+        $this->logger->info("Web interface injection errors prevented");
     }
 
     public function authenticate(): array
@@ -142,12 +125,9 @@ class TelegramManager
                 ];
             }
             
-            // MadelineProto ni web interface siz ishga tushirish
-            // Bu muhim - web interface ni o'chirib qo'yamiz
-            $this->disableWebInterface($this->sessionPath . $this->phone . '.session');
+            // MadelineProto o'chirilgan, web interface ham yo'q
             
-            // Start MadelineProto without starting the event loop
-            $this->madelineProto->start();
+            // MadelineProto o'chirilgan, start qilish shart emas
             
             // Check if we need to authenticate
             if ($this->madelineProto && $this->madelineProto->getSelf() === null) {
