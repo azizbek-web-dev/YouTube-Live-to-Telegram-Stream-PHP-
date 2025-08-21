@@ -90,6 +90,4 @@ jspm_packages/
 *.db
 
 # Local development
-/test.php
-/simple_test.php
-/test_*.php
+
