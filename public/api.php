@@ -1,7 +1,8 @@
 <?php
 // Error handling - xatolarni ushlash
-error_reporting(0);
-ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -68,6 +69,9 @@ try {
     $method = $_SERVER['REQUEST_METHOD'];
     $action = $_GET['action'] ?? '';
 
+    // Debug logging
+    error_log("API Request - Method: $method, Action: $action, URI: " . $_SERVER['REQUEST_URI']);
+
     if (empty($action)) {
         http_response_code(400);
         echo json_encode(['error' => 'Action parameter is required']);
@@ -97,6 +101,20 @@ try {
 
 function handleGetRequest($action) {
     switch ($action) {
+        case 'test':
+            // Simple test endpoint
+            echo json_encode([
+                'success' => true,
+                'message' => 'API is working!',
+                'action' => $action,
+                'timestamp' => date('Y-m-d H:i:s'),
+                'server_info' => [
+                    'php_version' => PHP_VERSION,
+                    'server_time' => date('Y-m-d H:i:s'),
+                    'request_uri' => $_SERVER['REQUEST_URI'] ?? 'unknown'
+                ]
+            ]);
+            break;
         case 'channels':
             getAdminChannels();
             break;
@@ -111,7 +129,7 @@ function handleGetRequest($action) {
             break;
         default:
             http_response_code(400);
-            echo json_encode(['error' => 'Invalid action']);
+            echo json_encode(['error' => 'Invalid action: ' . $action]);
             break;
     }
 }

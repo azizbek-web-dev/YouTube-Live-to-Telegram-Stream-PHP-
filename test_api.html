@@ -8,6 +8,7 @@
 <body>
     <h1>API Test</h1>
     <button onclick="testAPI()">Test API</button>
+    <button onclick="testDirectAPI()">Test Direct API</button>
     <div id="result"></div>
 
     <script>
@@ -26,10 +27,13 @@
             resultDiv.innerHTML = 'Testing...';
             
             try {
-                const response = await fetch('/api.php?action=channels');
+                // Avval test endpoint ni sinab ko'ramiz
+                const response = await fetch('/api.php?action=test');
                 const text = await response.text();
                 
                 console.log('Response text:', text);
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
                 
                 try {
                     const data = JSON.parse(text);
@@ -40,6 +44,39 @@
                 }
             } catch (error) {
                 resultDiv.innerHTML = '<p style="color: red;">Fetch error: ' + error.message + '</p>';
+                console.error('Full error:', error);
+            }
+        }
+
+        // Qo'shimcha test funksiyasi
+        async function testDirectAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing direct API...';
+            
+            try {
+                const response = await fetch('/api.php?action=channels', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const text = await response.text();
+                console.log('Direct API response:', text);
+                
+                if (response.ok) {
+                    try {
+                        const data = JSON.parse(text);
+                        resultDiv.innerHTML = '<pre>Success: ' + JSON.stringify(data, null, 2) + '</pre>';
+                    } catch (parseError) {
+                        resultDiv.innerHTML = '<p style="color: red;">Parse error: ' + parseError.message + '</p><pre>' + text + '</pre>';
+                    }
+                } else {
+                    resultDiv.innerHTML = '<p style="color: red;">HTTP Error: ' + response.status + '</p><pre>' + text + '</pre>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<p style="color: red;">Network error: ' + error.message + '</p>';
             }
         }
     </script>
