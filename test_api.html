@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Test</h1>
+    <button onclick="testAPI()">Test API</button>
+    <div id="result"></div>
+
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch('/api.php?action=channels');
+                const text = await response.text();
+                
+                console.log('Response text:', text);
+                
+                try {
+                    const data = JSON.parse(text);
+                    resultDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                } catch (parseError) {
+                    resultDiv.innerHTML = '<p style="color: red;">JSON parsing error: ' + parseError.message + '</p>' +
+                                        '<p>Response content:</p><pre>' + text + '</pre>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<p style="color: red;">Fetch error: ' + error.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html>

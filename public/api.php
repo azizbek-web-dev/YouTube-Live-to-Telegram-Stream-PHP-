@@ -1,8 +1,40 @@
 <?php
+// Error handling - xatolarni ushlash
+error_reporting(0);
+ini_set('display_errors', 0);
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
+
+// Global error handler
+function handleError($errno, $errstr, $errfile, $errline) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => 'Internal server error',
+        'message' => $errstr,
+        'file' => basename($errfile),
+        'line' => $errline
+    ]);
+    exit;
+}
+
+set_error_handler('handleError');
+
+// Exception handler
+function handleException($e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => 'Exception occurred',
+        'message' => $e->getMessage(),
+        'file' => basename($e->getFile()),
+        'line' => $e->getLine()
+    ]);
+    exit;
+}
+
+set_exception_handler('handleException');
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -10,31 +42,38 @@ use TelegramLive\TelegramManager;
 use TelegramLive\LiveStreamManager;
 use TelegramLive\Database;
 
-// Load environment variables
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
-
-// Initialize database
 try {
-    $database = Database::getInstance();
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]);
-    exit;
-}
 
-session_start();
+    // Load environment variables
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+    $dotenv->load();
 
-// Handle preflight request
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
+    // Initialize database
+    try {
+        $database = Database::getInstance();
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]);
+        exit;
+    }
 
-$method = $_SERVER['REQUEST_METHOD'];
-$action = $_GET['action'] ?? '';
+    session_start();
 
-try {
+    // Handle preflight request
+    if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+        http_response_code(200);
+        exit;
+    }
+
+    $method = $_SERVER['REQUEST_METHOD'];
+    $action = $_GET['action'] ?? '';
+
+    if (empty($action)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Action parameter is required']);
+        exit;
+    }
+
     switch ($method) {
         case 'GET':
             handleGetRequest($action);
@@ -47,9 +86,13 @@ try {
             echo json_encode(['error' => 'Method not allowed']);
             break;
     }
+
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()]);
+    echo json_encode(['error' => 'Server error: ' . $e->getMessage()]);
+} catch (Error $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Fatal error: ' . $e->getMessage()]);
 }
 
 function handleGetRequest($action) {

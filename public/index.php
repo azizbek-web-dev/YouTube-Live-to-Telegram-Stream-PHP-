@@ -405,20 +405,94 @@ $activeStreams = [];
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Utility functions
         function selectChannel(channelId, channelName) {
             document.getElementById('channel_id').value = channelId;
             // Scroll to stream form
             document.getElementById('streamForm').scrollIntoView({ behavior: 'smooth' });
         }
 
+        // Safe JSON parsing function
+        function safeJsonParse(jsonString) {
+            try {
+                return JSON.parse(jsonString);
+            } catch (error) {
+                console.error('JSON parsing error:', error);
+                console.error('Response content:', jsonString);
+                return null;
+            }
+        }
+
+        // Safe fetch function with error handling
+        async function safeFetch(url, options = {}) {
+            try {
+                const response = await fetch(url, options);
+                
+                // Check if response is ok
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Get response text first
+                const text = await response.text();
+                
+                // Try to parse as JSON
+                const data = safeJsonParse(text);
+                
+                if (data === null) {
+                    throw new Error('Invalid JSON response from server');
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('Fetch error:', error);
+                throw error;
+            }
+        }
+
+        // API functions
+        async function getChannels() {
+            try {
+                const data = await safeFetch('/api.php?action=channels');
+                return data;
+            } catch (error) {
+                console.error('Failed to get channels:', error);
+                return { error: 'Kanal ma\'lumotlarini olishda xatolik' };
+            }
+        }
+
+        async function getStreams() {
+            try {
+                const data = await safeFetch('/api.php?action=streams');
+                return data;
+            } catch (error) {
+                console.error('Failed to get streams:', error);
+                return { error: 'Stream ma\'lumotlarini olishda xatolik' };
+            }
+        }
+
         // Auto-hide alerts after 5 seconds
         setTimeout(function() {
             const alerts = document.querySelectorAll('.alert');
             alerts.forEach(function(alert) {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
+                try {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                } catch (error) {
+                    console.error('Error closing alert:', error);
+                }
             });
         }, 5000);
+
+        // Global error handler
+        window.addEventListener('error', function(event) {
+            console.error('Global error:', event.error);
+        });
+
+        // Unhandled promise rejection handler
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+        });
     </script>
 </body>
 </html>

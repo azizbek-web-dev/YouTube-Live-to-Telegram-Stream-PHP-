@@ -1,0 +1,30 @@
+🚀 TELEGRAM LIVE STREAMING - HOSTING GA JOYLASH
+
+📋 QADAMLAR:
+
+1. Barcha fayllarni hosting da public_html papkasiga yuklang
+
+2. .env faylini yarating:
+   cp env.example .env
+
+3. .env faylini tahrirlang:
+   - TELEGRAM_API_ID va TELEGRAM_API_HASH ni kiriting
+   - YOUTUBE_API_KEY ni kiriting  
+   - Database ma'lumotlarini kiriting
+
+4. Papka huquqlarini o'rnating:
+   chmod 755 public/sessions
+   chmod 755 uploads
+   chmod 755 logs
+
+5. Database yarating:
+   CREATE DATABASE telegram_live;
+
+6. Web interfeysga kiring:
+   https://yourdomain.com/public/
+
+📚 Batafsil ma'lumot: DEPLOYMENT.md
+
+🔧 Xatolik bo'lsa: logs/ papkasini tekshiring
+
+✅ Tayyor!
