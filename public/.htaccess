@@ -6,10 +6,10 @@ RewriteEngine On
 # Handle API requests - to'g'ridan-to'g'ri api.php ga yo'naltirish
 RewriteRule ^api\.php$ api.php [L]
 
-# Handle API requests with parameters
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^api\.php\?(.*)$ api.php?$1 [QSA,L]
+# Handle API requests with parameters - bu avtomatik ishlaydi
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^api\.php\?(.*)$ api.php?$1 [QSA,L]
 
 # Block MadelineProto web interface requests
 RewriteCond %{REQUEST_URI} ^/.*\.session

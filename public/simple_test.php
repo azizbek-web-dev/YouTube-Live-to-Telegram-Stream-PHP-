@@ -40,6 +40,16 @@ header('Content-Type: text/html; charset=utf-8');
         ?>
     </div>
 
+    <h2>Test 4: Server Info</h2>
+    <div id="result4">
+        <?php
+        echo "<p><strong>Current Directory:</strong> " . __DIR__ . "</p>";
+        echo "<p><strong>Document Root:</strong> " . $_SERVER['DOCUMENT_ROOT'] . "</p>";
+        echo "<p><strong>Request URI:</strong> " . $_SERVER['REQUEST_URI'] . "</p>";
+        echo "<p><strong>Script Name:</strong> " . $_SERVER['SCRIPT_NAME'] . "</p>";
+        ?>
+    </div>
+
     <script>
         async function testDirect() {
             const resultDiv = document.getElementById('result1');
