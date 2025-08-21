@@ -48,11 +48,7 @@ Thumbs.db
 ehthumbs.db
 Thumbs.db
 
-# PHP
-*.phar
-
 # Composer
-composer.phar
 composer.lock
 
 # Runtime data
