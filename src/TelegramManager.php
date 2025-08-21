@@ -96,17 +96,21 @@ class TelegramManager
         $sessionFile = $this->sessionPath . $this->phone . '.session';
         
         try {
-            // MadelineProto 8.0 uchun eng minimal sozlamalar
+            // MadelineProto 8.0 uchun to'g'ri sozlamalar
             $settings = new Settings;
             
-            // Faqat API credentials - boshqa sozlamalarni o'tkazib yuboramiz
+            // API credentials
             $settings->getAppInfo()->setApiId((int)$_ENV['TELEGRAM_API_ID']);
             $settings->getAppInfo()->setApiHash($_ENV['TELEGRAM_API_HASH']);
-
-            // Create MadelineProto instance with minimal settings
+            
+            // Web interface ni to'liq o'chirish uchun
+            // MadelineProto 8.0 da bu sozlamalar avtomatik
+            $this->logger->info("Initializing MadelineProto with web interface disabled");
+            
+            // Create MadelineProto instance
             $this->madelineProto = new API($sessionFile, $settings);
             
-            // Web interface ni o'chirish
+            // Web interface ni qo'shimcha o'chirish
             $this->disableWebInterface($sessionFile);
             
             $this->logger->info("MadelineProto initialized successfully for session: " . $sessionFile);
@@ -121,11 +125,22 @@ class TelegramManager
         try {
             $this->logger->info("Starting authentication for phone: " . $this->phone);
             
+            // MadelineProto mavjudligini tekshirish
+            if ($this->madelineProto === null) {
+                $this->logger->error("MadelineProto not initialized");
+                return [
+                    'success' => false,
+                    'message' => 'Telegram integration failed to initialize',
+                    'requires_auth' => false,
+                    'initialization_error' => true
+                ];
+            }
+            
             // Start MadelineProto without starting the event loop
             $this->madelineProto->start();
             
             // Check if we need to authenticate
-            if (!$this->madelineProto->getSelf()) {
+            if ($this->madelineProto && !$this->madelineProto->getSelf()) {
                 $this->logger->info("Authentication required - QR code or phone verification needed");
                 return [
                     'success' => false,
@@ -158,6 +173,12 @@ class TelegramManager
         try {
             $this->logger->info("Starting event loop for phone: " . $this->phone);
             
+            // Check if MadelineProto is available
+            if ($this->madelineProto === null) {
+                $this->logger->error("MadelineProto not initialized");
+                throw new \RuntimeException("MadelineProto not initialized");
+            }
+            
             // Check if we're authenticated first
             if (!$this->madelineProto->getSelf()) {
                 throw new \RuntimeException("Not authenticated. Please authenticate first.");
@@ -173,7 +194,7 @@ class TelegramManager
     public function stopLoop(): void
     {
         try {
-            if (isset($this->madelineProto)) {
+            if (isset($this->madelineProto) && $this->madelineProto !== null) {
                 $this->logger->info("Stopping event loop for phone: " . $this->phone);
                 $this->madelineProto->stop();
             }

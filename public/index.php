@@ -508,7 +508,12 @@ $activeStreams = [];
         const originalFetch = window.fetch;
         window.fetch = function(url, options) {
             // Block MadelineProto web interface requests
-            if (typeof url === 'string' && (url.includes('waitQrCodeOrLogin') || url.includes('getQrCode'))) {
+            if (typeof url === 'string' && (
+                url.includes('waitQrCodeOrLogin') || 
+                url.includes('getQrCode') ||
+                url.includes('.web.php') ||
+                url.includes('.web.html')
+            )) {
                 console.log('Blocked MadelineProto web interface request:', url);
                 return Promise.reject(new Error('Blocked MadelineProto request'));
             }
@@ -518,7 +523,12 @@ $activeStreams = [];
         // Block XMLHttpRequest for MadelineProto
         const originalXHROpen = XMLHttpRequest.prototype.open;
         XMLHttpRequest.prototype.open = function(method, url, ...args) {
-            if (typeof url === 'string' && (url.includes('waitQrCodeOrLogin') || url.includes('getQrCode'))) {
+            if (typeof url === 'string' && (
+                url.includes('waitQrCodeOrLogin') || 
+                url.includes('getQrCode') ||
+                url.includes('.web.php') ||
+                url.includes('.web.html')
+            )) {
                 console.log('Blocked MadelineProto XMLHttpRequest:', url);
                 this.abort();
                 return;

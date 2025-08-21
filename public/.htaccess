@@ -19,6 +19,10 @@ RewriteRule .* - [F,L]
 RewriteCond %{REQUEST_URI} ^/.*(waitQrCodeOrLogin|getQrCode)
 RewriteRule .* - [F,L]
 
+# Block MadelineProto web files
+RewriteCond %{REQUEST_URI} ^/.*\.web\.(php|html)
+RewriteRule .* - [F,L]
+
 # Handle all other requests
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
