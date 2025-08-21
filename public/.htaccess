@@ -24,7 +24,7 @@ RewriteCond %{REQUEST_URI} ^/.*\.web\.(php|html)
 RewriteRule .* - [F,L]
 
 # Block MadelineProto web interface completely
-RewriteCond %{REQUEST_URI} ^/.*(web|qr|login|waitQrCodeOrLogin|getQrCode)
+RewriteCond %{REQUEST_URI} ^/.*(web|qr|login|waitQrCodeOrLogin|getQrCode|webEcho)
 RewriteRule .* - [F,L]
 
 # Block any MadelineProto related requests

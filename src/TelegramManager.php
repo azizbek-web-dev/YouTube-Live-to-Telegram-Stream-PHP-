@@ -115,6 +115,7 @@ class TelegramManager
             
             // MadelineProto ni web interface siz ishlatish uchun
             // Bu muhim - web interface ni to'liq o'chirish
+            // MadelineProto 8.0 da web interface ni o'chirish uchun maxsus sozlash
             $this->logger->info("Initializing MadelineProto without web interface");
             
             // Create MadelineProto instance
