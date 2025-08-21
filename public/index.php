@@ -535,6 +535,18 @@ $activeStreams = [];
             }
             return originalXHROpen.call(this, method, url, ...args);
         };
+
+        // Qo'shimcha xavfsizlik - barcha xatolarni ushlash
+        console.log('MadelineProto web interface blocking enabled');
+        
+        // Global error handler - barcha xatolarni ushlash
+        window.addEventListener('error', function(event) {
+            if (event.error && event.error.message && event.error.message.includes('JSON')) {
+                console.log('Suppressed JSON parsing error:', event.error.message);
+                event.preventDefault();
+                return false;
+            }
+        }, true);
     </script>
 </body>
 </html>

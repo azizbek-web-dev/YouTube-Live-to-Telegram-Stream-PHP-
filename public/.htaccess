@@ -23,6 +23,14 @@ RewriteRule .* - [F,L]
 RewriteCond %{REQUEST_URI} ^/.*\.web\.(php|html)
 RewriteRule .* - [F,L]
 
+# Block MadelineProto web interface completely
+RewriteCond %{REQUEST_URI} ^/.*(web|qr|login)
+RewriteRule .* - [F,L]
+
+# Block any MadelineProto related requests
+RewriteCond %{REQUEST_URI} ^/.*madeline
+RewriteRule .* - [F,L]
+
 # Handle all other requests
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

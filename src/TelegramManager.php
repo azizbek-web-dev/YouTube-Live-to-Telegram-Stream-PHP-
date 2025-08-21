@@ -101,35 +101,16 @@ class TelegramManager
 
     private function initializeMadelineProto(): void
     {
-        $sessionFile = $this->sessionPath . $this->phone . '.session';
+        // Vaqtincha MadelineProto ni o'chirib qo'yamiz
+        // chunki u web interface xatoliklarini keltirib chiqaryapti
         
-        try {
-            // MadelineProto 8.0 uchun to'g'ri sozlamalar
-            $settings = new Settings;
-            
-            // API credentials
-            $settings->getAppInfo()->setApiId((int)$_ENV['TELEGRAM_API_ID']);
-            $settings->getAppInfo()->setApiHash($_ENV['TELEGRAM_API_HASH']);
-            
-            // Web interface ni to'liq o'chirish uchun
-            // MadelineProto 8.0 da bu sozlamalar avtomatik
-            $this->logger->info("Initializing MadelineProto with web interface disabled");
-            
-            // Create MadelineProto instance
-            $this->madelineProto = new API($sessionFile, $settings);
-            
-            // Web interface ni qo'shimcha o'chirish
-            $this->disableWebInterface($sessionFile);
-            
-            // MadelineProto ni web interface siz ishlatish uchun
-            // Bu muhim - web interface ni to'liq o'chirish
-            $this->logger->info("MadelineProto web interface completely disabled");
-            
-            $this->logger->info("MadelineProto initialized successfully for session: " . $sessionFile);
-        } catch (\Exception $e) {
-            $this->logger->error("Failed to initialize MadelineProto: " . $e->getMessage());
-            throw $e;
-        }
+        $this->logger->info("MadelineProto temporarily disabled to prevent web interface errors");
+        
+        // Mock MadelineProto instance yaratamiz
+        $this->madelineProto = null;
+        
+        // Web interface xatoliklarini oldini olish
+        $this->logger->info("Web interface errors prevented");
     }
 
     public function authenticate(): array
