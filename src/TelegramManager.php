@@ -96,27 +96,17 @@ class TelegramManager
         $sessionFile = $this->sessionPath . $this->phone . '.session';
         
         try {
+            // MadelineProto 8.0 uchun eng minimal sozlamalar
             $settings = new Settings;
             
-            // Connection settings
-            $settings->getConnection()->setMaxMediaSocketCount(2);
-            $settings->getConnection()->setRetry(true);
-            
-            // Disable web interface to prevent longPollQr errors
-            $settings->getRPC()->setLimitMedia(true);
-            
-            // MadelineProto 8.0 da web interface ni o'chirish uchun
-            // Settings da maxsus sozlash yo'q, shuning uchun keyin o'chirishimiz kerak
-            
-            // Set API credentials from environment
+            // Faqat API credentials - boshqa sozlamalarni o'tkazib yuboramiz
             $settings->getAppInfo()->setApiId((int)$_ENV['TELEGRAM_API_ID']);
             $settings->getAppInfo()->setApiHash($_ENV['TELEGRAM_API_HASH']);
 
-            // Create MadelineProto instance
+            // Create MadelineProto instance with minimal settings
             $this->madelineProto = new API($sessionFile, $settings);
             
-            // MadelineProto 8.0 da web interface ni o'chirish uchun
-            // Session faylida maxsus sozlash qilamiz
+            // Web interface ni o'chirish
             $this->disableWebInterface($sessionFile);
             
             $this->logger->info("MadelineProto initialized successfully for session: " . $sessionFile);
