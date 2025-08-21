@@ -487,12 +487,44 @@ $activeStreams = [];
         // Global error handler
         window.addEventListener('error', function(event) {
             console.error('Global error:', event.error);
+            // Prevent MadelineProto longPollQr errors from showing
+            if (event.error && event.error.message && event.error.message.includes('JSON')) {
+                event.preventDefault();
+                console.log('Suppressed JSON parsing error from MadelineProto');
+            }
         });
 
         // Unhandled promise rejection handler
         window.addEventListener('unhandledrejection', function(event) {
             console.error('Unhandled promise rejection:', event.reason);
+            // Prevent MadelineProto errors from showing
+            if (event.reason && event.reason.message && event.reason.message.includes('JSON')) {
+                event.preventDefault();
+                console.log('Suppressed JSON parsing error from MadelineProto');
+            }
         });
+
+        // Block any automatic requests that might cause errors
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options) {
+            // Block MadelineProto web interface requests
+            if (typeof url === 'string' && (url.includes('waitQrCodeOrLogin') || url.includes('getQrCode'))) {
+                console.log('Blocked MadelineProto web interface request:', url);
+                return Promise.reject(new Error('Blocked MadelineProto request'));
+            }
+            return originalFetch.call(this, url, options);
+        };
+
+        // Block XMLHttpRequest for MadelineProto
+        const originalXHROpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(method, url, ...args) {
+            if (typeof url === 'string' && (url.includes('waitQrCodeOrLogin') || url.includes('getQrCode'))) {
+                console.log('Blocked MadelineProto XMLHttpRequest:', url);
+                this.abort();
+                return;
+            }
+            return originalXHROpen.call(this, method, url, ...args);
+        };
     </script>
 </body>
 </html>

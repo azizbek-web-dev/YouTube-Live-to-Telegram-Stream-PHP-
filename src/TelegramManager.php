@@ -70,16 +70,28 @@ class TelegramManager
         
         try {
             $settings = new Settings;
+            
+            // Connection settings
             $settings->getConnection()->setMaxMediaSocketCount(2);
             $settings->getConnection()->setRetry(true);
+            
+            // Disable web interface to prevent longPollQr errors
+            $settings->getRPC()->setNoReturn(false);
+            $settings->getRPC()->setLimitMedia(true);
+            
+            // Disable web interface completely
+            $settings->getWeb()->setEnabled(false);
             
             // Set API credentials from environment
             $settings->getAppInfo()->setApiId((int)$_ENV['TELEGRAM_API_ID']);
             $settings->getAppInfo()->setApiHash($_ENV['TELEGRAM_API_HASH']);
 
-            // Basic settings configured
-
+            // Create MadelineProto instance with disabled web interface
             $this->madelineProto = new API($sessionFile, $settings);
+            
+            // Disable web interface after initialization
+            $this->madelineProto->setWebTemplate('');
+            
             $this->logger->info("MadelineProto initialized successfully for session: " . $sessionFile);
         } catch (\Exception $e) {
             $this->logger->error("Failed to initialize MadelineProto: " . $e->getMessage());

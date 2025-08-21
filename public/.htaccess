@@ -9,6 +9,14 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} ^/api/
 RewriteRule ^api/(.*)$ api.php [QSA,L]
 
+# Block MadelineProto web interface requests
+RewriteCond %{REQUEST_URI} ^/.*\.session
+RewriteRule .* - [F,L]
+
+# Block any requests that might trigger MadelineProto web interface
+RewriteCond %{REQUEST_URI} ^/.*(waitQrCodeOrLogin|getQrCode)
+RewriteRule .* - [F,L]
+
 # Handle all other requests
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

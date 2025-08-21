@@ -11,6 +11,16 @@
     <div id="result"></div>
 
     <script>
+        // Block MadelineProto requests
+        const originalFetch = window.fetch;
+        window.fetch = function(url, options) {
+            if (typeof url === 'string' && (url.includes('waitQrCodeOrLogin') || url.includes('getQrCode'))) {
+                console.log('Blocked MadelineProto request:', url);
+                return Promise.reject(new Error('Blocked MadelineProto request'));
+            }
+            return originalFetch.call(this, url, options);
+        };
+
         async function testAPI() {
             const resultDiv = document.getElementById('result');
             resultDiv.innerHTML = 'Testing...';
